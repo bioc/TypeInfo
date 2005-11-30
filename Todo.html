@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title></title>
+</head>
+
+<body>
+<h1></h1>
+
+<dl>
+  <dt>
+  <li> use checkType() in checkArgs() and checkReturnValue().
+  <dd>
+
+  <dt>
+    <li>[DONE] Make IndependentTypesSpecification convert character vectors
+    into  InheritsTypeTest</li>
+  <dd>
+
+  <dt>
+    <li>[DONE] If the last line has a return(.....), don't rewrite it twice. </li>
+  <dd>    
+  
+  <dt>
+  <li>[DONE] Have to deal with validation of the return value
+  <dd> Should know what the signature was for the actual call.
+      This should be done in the C code.
+      <br>
+     Currently, we have to explicitly call return() or
+    checkReturnValue().
+    This is done by rewriting the code to replace calls to return,
+    etc. with the relevant call.
+
+  <dt>
+  <li>[PARTLY] Pretty printing for functions with type info.
+  <dd>
+
+  <dt>
+  <li>[NOTE] The order in which checkArgs() processes the signatures for a
+  SimultaneousTypeSpecification
+  is important when determining the matching signature that is passed
+  to checkReturnValue.
+  <dd>
+
+  <dt>
+  <li> The error should come from the function ideally, not checkArgs
+  or checkReturnValue.
+  <dd> Too difficult to arrange in the prototype implementation with checkReturnValue(),
+    etc. Wait until we do this in C.
+      
+</dl>
+
+
+
+<hr>
+<address><a href="http://www.stat.ucdavis.edu/~duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@wald.ucdavis.edu>&lt;duncan@wald.ucdavis.edu&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Wed Sep 28 06:56:38 PDT 2005
+<!-- hhmts end -->
+</body> </html>

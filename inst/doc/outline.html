@@ -1,0 +1,310 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title></title>
+</head>
+
+<body>
+<h1>Optional Type Specification in R</h1>
+
+
+In the last year I have given a few talks on reflectance and the power
+it gives us to integrate functionality from other languages and
+systems into R (and other statistical systems).
+Additionally, I have illustrated how we can make our functionality
+available. The RDCOMServer and RDCOMEvents packages are examples
+of how we can publish servers with methods implemented via
+R functions. The <a href="http://cran.r-project.org/src/contrib/SSOAP"
+>SSOAP</a> package is another example of this style of
+service.
+
+<p/>
+
+An important aspect that is missing from the way we publish servers is
+information about the types of the arguments a method expects, what
+type of object it will return and what sort of exceptions can it
+raise<sup><a href="#footnote1">1</a></sup>.  Other client systems (Perl,
+Python, Visual Basic) use this information in the same way we do to
+provide compiled bindings to servers.  While we can take advantage of
+the type specification for servers, we do not provide it to others.
+This is partly because R is a dynamic, run-time typed language.  But
+when we publish a server, we have definite expectations about its
+inputs and its outputs.  We may accept different combinations of
+inputs, and this complicates matters.  But often we expect a simple
+set of options and the return type is an element of a small set of
+possible types.
+
+<p/>
+
+This information is also true when we are developing regular R
+packages and even functions, rather than thinking about distributed
+computing via client-server models and reflectance.  Type checking is
+a very valuable aspect of compiled languages. The compiler tells us
+what we have gotten wrong before we run it and helps us to fix
+things. Many of the errors are simple and amount to typographical
+mistakes.  Others however are more conceptual and the compiler helps
+us to identify them.
+
+<p/>
+We can perform type checking R by adding validation
+code to the beginning of the function.
+This can check the different combinations of inputs.
+This is a luxury of run-time type discovery.
+<pre>
+function(x, y, z) {
+ 
+  if(!(is(x, "integer") && is(y, "integer"))
+     && !(is(x, "matrix") && missing(y) && is(z, "logical")))
+    stop("Expecting either an integer, integer or a matrix, , logical as inputs")
+}
+</pre>
+In addition to simple type-checking, we can perform
+more content-based checking.
+For example, we can verify that x and y have the same length.
+
+<p/>
+
+While we can do these tests in each function, it would be more
+convenient to have the interpreter do the tests itself and therefore
+leave our functions more simple and easier to read.  If we can
+associate the expected types, then the interpreter can validate that
+the arguments match the given <i>signature</i>.
+We can simply describe the combinations of types using named vectors
+<pre>
+ signatures = 
+ list(
+     c(x = "integer", y = "integer"),
+     c(x = "matrix", z = "logical")
+ )
+</pre>
+
+When evaluating the function , the interpreter can
+access this information and then compare the arguments.
+
+<pre>
+validated = FALSE
+for(i in signatures) {
+  if(all(sapply(names(i), function(el) is(get(el), i[el])))) {
+    validated = TRUE
+    break
+  }
+}
+
+if(!validated)
+  stop("Unexpected call signature")
+</pre>
+
+We can associate the signatures with the function
+by registering it as meta-data in some way. Attaching it via
+attributes is one way. Writing it to a meta-data object is another
+that separates the function and the specification but is perfectly
+fine.
+
+<p/>
+
+We need to ensure that the signatures object is used.  The function
+cannot necessarily see itself.
+It can use <r:func>sys.function</r:func> to access itself:
+<pre>
+ attr(sys.function(), "signatures")
+</pre>
+and then it can validate the call.
+Of course, it is nicer if the interpreter does.
+It leaves the original code as-is without requiring
+the validation be part of the body.
+And if we think about it, the return value is very
+hard to do this way (without redefining the return function!).
+
+<p/>
+When the interpreter evaluates a call to a function,
+it needs to check if the function has type information.
+If so, it validates this.
+Assuming thre is no error it evaluates the
+body of the function in the usual way.
+When the function returns control normally,
+i.e. by an implicit or explicit call to <code>return</code>,
+then the evaluator needs to check the return type against
+those specified by the signatures.
+
+<p/>
+We can do this rapidly in C code.
+And this is probably the appropriate place to do this.
+Alternatively, we can modify the do_eval routine
+to pass control back to another R function
+that performs these steps.
+We can, in fact,  do both by making
+the internal SEXP have a pointer
+to a routine that actually
+performs the call, along with the validation.
+
+
+
+<p/>
+
+We can also attach information about the return type of the function.
+Each of the signatures has an expected target type,
+or collection of possible types.  These might be based
+on the actual content of the material, but this is not
+very common.
+
+
+<p/>
+The S4 mechanism
+allows us to do this (although we do have to make functions generic to
+use it).  This amounts to specifying a signature along with a return
+type. 
+
+
+<dl>
+
+  <dt>
+   <li> Lazy evaluation is an issue that we have to deal with.
+       Basically, we cannot support lazy evaluation of the
+       arguments that referenced in the type specification signatures.
+       We may want to force the evaluation of all the
+        reference arguments in any of the signatures
+       or just the ones we go through to find if one matches.
+       The former gives a clear semantic; the latter
+       gives us unpredictable behavior but avoids overhead.
+  <dd>
+
+  <dt>
+  <li> We want two different ways to specify
+       the types.
+       One is as above, giving the signature
+      of a particular call.
+       The other is a set of the different
+       possible types for each individual argument.
+       For example, we might write
+         c(x = c("matrix", "integer", "A"),
+           y = c("logical", "character"))
+       And this would mean that we match
+       the class of x to any of those in the
+        signature type for that parameter,
+        and separately match the class of the argument
+       y to the types in that parameter specification.
+
+      In R code, this is
+
+        class(x) %in% signature$x && class(y) %in% signature$y
+
+      We can use a different class to represent this grid of
+       types rather than a list of simultaneous types.
+       
+      
+  <dd>
+
+
+  <dt>
+  <li> Keeping an eye on generating "GUI"s from  functions,
+       we want to be able to specify whether a parameter
+       should be represented as a radio button,
+       or a checkbox.
+       Something that we did in another project is to have a method
+       for a "type" to construct the GUI element.
+       We would need to dispatch on the type and 
+       the target context, e.g. a GUI toolkit (RGtk, tcltk), HTML
+       form.
+       An enumeration would map to a radio button.
+       A vector  would map to checkboxes so that one could
+       specify several values. 
+       (We also need to have a ScalarInteger, etc. so that it says that
+       the input is a element rather than a vector.)
+       We should look at XForms and
+       HTML forms ,  and InfoPath (and .xsd) and for information.  But it is clear we
+       need to have some facility to specify a quantity.
+       Schema also come to mind, as do contracts.
+  <dd>      
+
+  <dt>
+  <li> How to handle ...?
+  <dd> Robert argues if we are inclined to put
+      type information on an "argument" that is not a formal
+      argument/parameter, then that argument should become a parameter.
+      We have to handle the cases of legacy code. So if the author of
+      the method.
+
+  <dt>
+  <li> We can allow the signatures to be class names or
+       expressions, or functions.
+       Then these can do dynamic/content checking.
+  <dd>     
+      We might like the return value to be ifelse( x < 1, "A", "B").
+       See ff in tests/return.S
+
+
+  <dt>
+  <li> handling return() is problematic at the S-language level.
+   We need to be able to check the return value after it has been 
+   or as it is being  returned but before control is returned to the
+   caller of the function.  There is a nice trick we can use
+   which is to explicitly call checkReturnValue() with the return value,
+   and a very special expression return(value).
+   Also we want the signature that was matched in the call to checkArgs()
+  <dd>
+
+
+
+ <dt>
+ <li> Use <a href="http://www.stat.uiowa.edu/~luke/R/codetools/codetools.tar.gz">Luke's
+ codetools package</a>
+   to also analyze a function for free variables, etc.
+   
+
+ <dd> 
+      
+  <dt>
+    <li>
+PCCTS/Antlr parser generator to provide an extended R syntax
+that maps to the existing internal data structures.
+  </li>
+  <dd>
+    This is complicated, but potentially better.
+    It allows the type information to be specified within the
+    definition of the functions itself.
+    Expressions like
+<pre>
+  foo =
+  function(matrix x, integer y, z) {
+  }
+</pre>
+ Unfortunately this may not
+
+
+ <dt>
+ <li> Make a checkArgs() function available so that the 
+  author of a function can invoke the type checking. Otherwise,
+ we don't check. And the checkArgs() can be called with no arguments,
+ character vector of argument names, or the argument sublist itself to froce 
+the evaluation of the arguments.
+ checkArgs() will reach into the calling frame of the function to be
+  checked,
+  get the meta-data for the type info and compare the arguments in the
+  frame as appropriate.
+ <dd>
+
+
+</dl>
+
+
+
+
+
+
+
+<center><hr width=50%></center>
+
+<ol>
+  <li>
+ <a name="footnote1"></a>Additional information would be nice like estimates of how
+long it will take, how much memory will it consume for given inputs,
+what sort of machine is it being run on, etc.  but these are not
+intrinsically code-related but rather server-based.)
+</li>
+</ol>
+
+
+<hr>
+<address><a href="http://www.stat.ucdavis.edu/~duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@wald.ucdavis.edu>&lt;duncan@wald.ucdavis.edu&gt;</a></address>
+<!-- hhmts start --> Last modified: Fri Sep 30 07:20:21 PDT 2005 <!-- hhmts end -->
+</body> </html>

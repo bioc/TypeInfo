@@ -1,0 +1,50 @@
+\documentclass{article}
+
+\begin{document}
+
+This package presents a concept that is currently missing from the R
+language and environment.  R is a dynamic, interpreted language. There
+is no need to declare variables and certainly no need to constrain a
+variable to have a particular type.  Rather, variables are merely
+names for values.  This is very convenient for interactive and casual
+``programming'' in the environment which was the primary motivation
+for S and R.  However, we are increasingly developing software written
+in the language itself, in contrast with simple scripts or interactive
+commands that best suit the loosely typed language.  One of the
+primary differences between writing code interactively and developing
+software is the need to make the software robust and handle many types
+of errors.  Programmers familiar with strongly typed languages such as
+C and Java will welcome the dynamic nature of R, but when developing
+software, the lack of checks in the code require the developer to
+explicitly add them. In C and Java, the compiler catches many such
+errors without any need for explicit testing by the developer.
+Instead, she is required to specify the expected types of the values
+for parameters of routines/functions and variables used in the
+routines.  In R, tests for the types of inputs must be added
+explicitly to the body of the function, mixing the actual computations
+of the function with these tests for sane inputs from the caller.  
+
+
+In addition to helping to identify programming errors by programmers,
+the type information on variables and parameters provides queryable
+meta-data that can be used to programmatically process the code.  It
+allows us, for example, to generate interfaces between one language
+and the compiled code. This information is essential as software
+becomes more component-oriented and dispersed.  The ability to
+simplify and automate the connectivity in a safe, reliable manner
+becomes increasingly important.
+
+
+The Omegahat language married together aspects of both the S and Java
+languages, maintaining the interactive use but allowing for optional
+type specification of parameters of routines and variables.  This
+package attempts to provide some of these facilities for R.
+
+
+There are two aspects to this package. The first is the specification
+of the type information, and the second is the application of that
+type information to validate the inputs to a function call.
+
+
+
+\end{document}
