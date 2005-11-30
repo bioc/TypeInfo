@@ -58,9 +58,9 @@ Class \code{"vector"}, by class \code{"character"}.
 
   m = array(1:60, c(3, 4, 5))
   tt = new("StrictIsTypeTest",  c("matrix"))
-  OptionalTyping:::checkType(m, tt)
+  TypeInfo:::checkType(m, tt)
 
   tt = new("StrictIsTypeTest",  c("array"))
-  OptionalTyping:::checkType(m, tt)
+  TypeInfo:::checkType(m, tt)
 }
 \keyword{classes}
