@@ -1,0 +1,309 @@
+%\VignetteIndexEntry{TypeInfo R News}
+%\VignetteKeywords{type specification argument return}
+%\VignettePackage{TypeInfo}
+
+\documentclass[a4paper]{report}
+\usepackage{Rnews}
+\usepackage[round]{natbib}
+\bibliographystyle{abbrvnat}
+
+\usepackage{graphicx}
+
+\newcommand{\TypeInfo}{\pkg{TypeInfo}}
+\newcommand{\STS}{\code{SimultaneousTypeSpecification}}
+\newcommand{\ITS}{\code{IndependentTypeSpecification}}
+\newcommand{\TypedSignature}{\code{TypedSignature}}
+\newcommand{\STT}{\code{StrictIsTypeTest}}
+\newcommand{\DTT}{\code{DynamicTypeTest}}
+\newcommand{\ITT}{\code{InheritsTypeTest}}
+\newcommand{\oneWayAnova}{\command{oneWayAnova}}
+
+\begin{document}
+\begin{article}
+
+<<echo=FALSE>>=
+options(width=45)
+@ 
+
+\title{Type specification for your functions}
+\author{by MT Morgan, Seth Falcon, Robert Gentleman, and Duncan Temple Lang}
+
+\maketitle
+
+You've written some amazing \R{} functions.
+How can others, even non-\R{} users, benefit from your hard work?
+Maybe there is some way to make it easier for other programmers to use your function?
+Perhaps a web-based form or dialog box, like those provided by the \pkg{widgetInvoke} package, would help users choose appropriate arguments?
+These objectives are easier to obtain when \R{} functions provide information about themselves.
+
+The \TypeInfo{} package annotates functions with information about arguments and return value types.
+\TypeInfo{} automatically checks that your function is called with appropriate arguments.
+You can then focus on writing the code in the body of your function, rather than checking values supplied by users.
+With \TypeInfo{} you and other \R{} programmers can ask about types of arguments and return values.
+This opens the door to creative possibilities, for instance automatically creating a work flow (perhaps even graphical `wizards') chaining function calls together into a complicated overall analysis.
+
+This \emph{RNews} article illustrate how to use \TypeInfo{} for argument and return type specification.
+We start with straight-forward ways of applying type information.
+Then we illustrate the flexibility of \TypeInfo{} for apply complicated type checks, including types satisfying arbitrary \R{} expressions.
+The article concludes with a brief look behind the scenes to expose limitations of \TypeInfo{}, and to highlight opportunities for using typed functions in advanced aspects of your own work.
+
+\section*{The basics: applying \command{typeInfo()}}
+Suppose your colleagues clamor for a function to perform one-way analysis of variance on data where the predictor is a \code{factor}.
+Easily done in \R{} with \code{lm}, but the \R{} formula notation might be more than needed for our simple function.
+To help our colleagues, we simplify the interface to refer to \code{response} and \code{predictor} variables.
+Many users expect an ANOVA table as output, so we return the result of \command{anova()} rather than \command{lm()}.
+Here is our function:
+<<oneWayAnova>>=
+oneWayAnova <- function( response, predictor ) {
+    expr <- substitute( response ~ predictor )
+    result <- lm( as.formula( expr ))
+    anova( result )
+}
+copyOfOneWayAnova <- oneWayAnova
+@ 
+We make a copy of the function definition to conveniently re-apply different type information, as will become apparent below.
+To test our function, we use data from the help page for \command{lm()}:
+<<analysis1>>=
+ctl <- c(4.17,5.58,5.18,6.11,4.50,4.61,5.17,4.53,5.33,5.14)
+trt <- c(4.81,4.17,4.41,3.59,5.87,3.83,6.03,4.89,4.32,4.69)
+group <- gl(2,10,20, labels=c("Ctl","Trt"))
+weight <- c(ctl, trt)
+oneWayAnova( weight, group )
+@ 
+
+\subsection*{Argument type checks}
+We want to make sure our users enter the right kinds of arguments.
+To do this, we add type information to make sure that \code{response} is \code{numeric}, and \code{predictor} a \code{factor}.
+We start by loading the \TypeInfo{} library\ldots
+<<>>=
+library(TypeInfo)
+@ 
+and, after defining \code{oneWayAnova},  add type information:
+<<echo=FALSE>>=
+typeInfo(oneWayAnova) <-
+  SimultaneousTypeSpecification(
+    TypedSignature(
+      response = "numeric",
+      predictor = "factor"),
+    returnType = "anova")
+@ 
+\begin{verbatim}
+typeInfo(oneWayAnova) <-
+  SimultaneousTypeSpecification(
+    TypedSignature(
+      response = "numeric",
+      predictor = "factor"),
+    returnType = "anova")
+\end{verbatim}
+The command \STS{} means that we want to impose a set of conditions that apply simultaneously to all arguments (and, optionally, the return type).
+\TypedSignature{} corresponds to one set of conditions.
+The structure of \TypedSignature{} is a list of argument names and their types.
+Specifying \code{returnType} advertises that our function returns an object of type \code{anova}, and checks that it really does return this type.
+The reason for placing \code{returnType} after \TypedSignature{} is clarified below.
+
+Using a typed function is exactly the same as using an untyped function:
+<<typedFunc>>=
+oneWayAnova( weight, group )
+@ 
+When the user supplies incorrect data, e.g., representing the \code{predictor} as \code{numeric} rather than \code{factor}
+<<sgroup, eval=FALSE>>=
+ngroup <- as.numeric( group )
+oneWayAnova( weight, ngroup )
+@ 
+\TypeInfo{} intervenes with an error:
+\begin{verbatim}
+Error in checkArgs(types, args = args, 
+  env = env, isMissing) : 
+    TypeInfo failed to match any signature
+\end{verbatim}
+This is helpful, as our user might otherwise have performed a linear regression rather than fixed-effects ANOVA.
+
+We might decide that, for our purposes, the \code{predictor} can be \code{factor} or \code{numeric}.
+We change the \STS{} to include another \TypedSignature{} (re-applying \command{typeInfo()} does \emph{not} automatically overwrite previous type specifications, so we must apply \command{typeInfo()} to a fresh version of \code{oneWayAnova}):
+<<echo=FALSE>>=
+oneWayAnova <- copyOfOneWayAnova
+typeInfo(oneWayAnova) <-
+  SimultaneousTypeSpecification(
+    TypedSignature(
+      response = "numeric",
+      predictor = "factor"),
+    TypedSignature(
+      response = "numeric",
+      predictor = "numeric"),
+    returnType = "anova")
+@ 
+\begin{verbatim}
+oneWayAnova <- copyOfOneWayAnova
+typeInfo(oneWayAnova) <-
+  SimultaneousTypeSpecification(
+    TypedSignature(
+      response = "numeric",
+      predictor = "factor"),
+    TypedSignature(
+      response = "numeric",
+      predictor = "numeric"),
+    returnType = "anova")
+\end{verbatim}
+This starts to show the flexibility of \TypeInfo{}.
+\STS{} allows for more than one \TypedSignature{}.
+At least one of the \TypedSignature{}s must be correct for the function to be evaluated.
+Conceptually, \STS{} performs a logical OR operation across the \TypedSignature{}s.
+On the other hand, each \TypedSignature{} specifies conditions that must all apply.
+\TypedSignature{} performs a logical AND on its elements.
+
+\subsection*{Finding out about type information}
+
+Once applied, functions can be queried about type information with \command{typeInfo()}.
+<<introspection>>=
+typeInfo(oneWayAnova)
+@ 
+The output illustrates how type information is stored.
+\command{typeInfo} returns an object of class \STS{}.
+The object contains a list of objects of class \code{TypedSignature}, and a \code{returnType} slot.
+Each \TypedSignature{} is a list with entries for each element with type specification.
+
+The information returned from \command{typeInfo()} provides useful information as-is.
+It can also be parsed by computer code to provide information useful in creation of graphical widgets or other interfaces.
+
+\section*{Flexible \TypeInfo{}}
+
+The presentation so far emphasizes the sort of basic type specification that is likely to be most useful when making \R{} functions available to other programming languages.
+\TypeInfo{} offers a range of methods for validating type that can be very useful for \R{} programmers, but that employ concepts not readily translated into other languages.
+A sampling of these are presented here, along with additional detail about the application of type specification .
+
+\subsection*{More on type tests}
+
+Notice in the example above that arguments are labeled with character strings of type names.
+A type specification of class \code{character} corresponds to an \ITT{}, as indicated explicitly for the \code{returnType} specification.
+An \ITT{} requires that the object belong to, or extends, the specified class.
+For instance, the values passed to the function in the \code{response} variable must return \code{TRUE} from the test \code{is(response, "numeric")}.
+Because of this, \command{oneWayAnova} works with \code{response} as either \code{numeric} or \code{integer}.
+<<integerVals>>=
+iweight <- as.integer( weight )
+oneWayAnova( iweight, group )
+@ 
+
+What other ways does \TypeInfo{} offer to specify type?
+\STT{} requires an exact match between the class of an object and the specified class(es).
+To specifying a strict match for \code{response} and \code{returnValue}, but an inherited match for \code{predictor}, write
+<<strictIs, echo=FALSE>>=
+oneWayAnova <- copyOfOneWayAnova
+typeInfo(oneWayAnova) <-
+  SimultaneousTypeSpecification(
+    TypedSignature(
+      response = StrictIsTypeTest("numeric"),
+      predictor = InheritsTypeTest("factor")),
+    returnType = StrictIsTypeTest("anova"))
+try(oneWayAnova(iweight, group))    # ERROR
+@ 
+\begin{verbatim}
+typeInfo(oneWayAnova) <-
+  SimultaneousTypeSpecification(
+    TypedSignature(
+      response = StrictIsTypeTest("numeric"),
+      predictor = InheritsTypeTest("factor")),
+    returnType = StrictIsTypeTest("anova"))
+\end{verbatim}
+<<strictIsTest>>=
+@ 
+Both \STT and \ITT{} accept a vector of class names.
+
+The \DTT{} allows evaluation of arbitrary expressions during type checking.
+For instance, the ANOVA anticipates that the length of \code{predictor} is the same as the length of \code{response}:
+\begin{verbatim}
+typeInfo(oneWayAnova) <-
+  SimultaneousTypeSpecification(
+    TypedSignature(
+      response = "numeric",
+      predictor = quote(
+        length(predictor) == length(response) 
+          && is(predictor, "factor"))),
+    returnType = StrictIsTypeTest("anova"))
+short <- weight[-1]
+oneWayAnova(short, group)   # ERROR
+\end{verbatim}
+Note that the expression in \DTT{} has access to argument names, and uses \command{quote()} to protect premature evaluation.
+\DTT{} can also be used in the return statement.
+
+As written here, the \code{returnType} applies to all \TypedSignature's.
+That is, the function always returns an \code{anova} object, regardless of argument type.
+Actually, each \TypedSignature{} can have its own \code{returnType}, allowing for a return type that depends on argument type.
+
+\subsection*{IndependentTypeSpecification}
+
+We saw one way of \oneWayAnova{} allowing both \code{numeric} and \code{factor} predictors.
+\ITS{} provides another way to specifying alternative types:
+<<IndependentTypeSpecification, echo=FALSE>>=
+oneWayAnova <- copyOfOneWayAnova
+typeInfo(oneWayAnova) <-
+  IndependentTypeSpecification(
+    response = "numeric",
+    predictor = c( "factor", "numeric" ))
+@ 
+\begin{verbatim}
+oneWayAnova <- copyOfOneWayAnova
+typeInfo(oneWayAnova) <-
+  IndependentTypeSpecification(
+    response = "numeric",
+    predictor = c("factor", "numeric"))
+\end{verbatim}
+\ITS{} expects a list of argument names, each with a character vector of possible types.
+While \STS{} performs a logical OR across each \TypedSignature{}, \ITS{} performs logical OR within arguments.
+
+\section*{Behind the scenes: opportunities and limitations with \TypeInfo{}}
+
+Several aspects of \TypeInfo{} provide opportunities for creative application.
+Type tests in \TypeInfo{} form a hierarchy of S4 classes.
+This makes it easy to transform \code{typeInfo} output to structures or textural representations that interface with other packages or programming languages.
+The approach is to specify methods that traverse the \TypeInfo{} hierarchy, transforming \TypeInfo{} objects into the desired format.
+\ITT{} and \STT{} rely on named classes, including user-defined S4 classes.
+Coupled with methods for parsing S4 objects (e.g., in the \pkg{XML} package), this provides one route to automatically generating \pkg{widgetInvoke} graphical interfaces or bindings for web-based services.
+
+\TypeInfo{} is not a universal solution.
+Perhaps the biggest limitation is that \TypeInfo{} does not deal with S4 methods.
+The rationale is that arguments used for method dispatch must already satisfy type criteria.
+However, S4 methods may contain arguments that are not used for method dispatch, and the type of these arguments cannot be typed.
+S4 method dispatch imposes a test equivalent only to \STS{} in conjunction with \code{InheritsTypeTest}, rather than allowing the flexibility of \TypeInfo{}.
+In addition, the \code{valueClass} argument of \command{setMethod()} allows specification but not checking of the return type. 
+A useful extension would enable \command{typeInfo()} to query S4 generics, providing a uniform interface to retrieving type information.
+
+Conceptually, \TypeInfo{} works by inserting type-checking code at the first line of the function, and after (implicit or explicit) \code{return} statements.
+The extra code requires evaluation, slowing execution and making \TypeInfo{} inappropriate in situations where speed is of the essence.
+In such situation, present a public type-checked `wrapper' to help ensures only correct argument types reach the speed-critical functions.
+\TypeInfo{} does not usually have side-effects, but a poorly written \DTT{} could alter argument or return values unexpectedly.
+
+\section*{Final hints and tips}
+
+We have seen how \TypeInfo{} annotates function definitions with information to check argument types.
+This has several advantages.
+The user is informed of incorrect arguments, avoiding possibly subtle errors during function execution.
+The programmer is free to focus on the body of the function, rather than argument type checking.
+Other programmers can determine argument requirements or return values without detailed inspection of code or documentation.
+These and other advantages suggest application of \TypeInfo{} as a way to enhance the effectiveness of your R programming.
+
+For many purposes, the combination of \STS{}, \TypedSignature{}, and a single \code{returnType} is the best way to use \TypeInfo{}.
+This results in type signatures that translate readily into prototype concepts in other programming languages, making it easier for both R and non-R users to benefit from the functions you create.
+More elaborate formulations, especially \DTT{}, are unlikely to be useful outside the R community, and may unnecessarily blur the distinction between type information, argument validation, and function execution. 
+On the other hand, clearly specified argument types may aid rigorous formal testing (e.g., unit and regression tests) of return values prior to package release.
+
+\TypeInfo{} can be useful for all functions, but is especially beneficial for functions exported in a package NAMESPACE.
+Don't forget to add \TypeInfo{} to the `Depends' field of your package DESCRIPTION file!
+
+\end{article}
+\end{document}
+
+%% 
+
+\begin{thebibliography}{1}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{{\tt #1}}\fi
+
+\bibitem[Ihaka and Gentleman(1996)]{R:Ihaka+Gentleman:1996}
+R.~Ihaka and R.~Gentleman.
+\newblock R: A language for data analysis and graphics.
+\newblock {\em Journal of Computational and Graphical Statistics}, 5\penalty0
+  (3):\penalty0 299--314, 1996.
+\newblock URL \url{http://www.amstat.org/publications/jcgs/}.
+
+\end{thebibliography}

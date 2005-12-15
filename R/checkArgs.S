@@ -29,9 +29,11 @@ function(f = sys.function(1), argNames, args = NULL, forceAll = FALSE, env = sys
 
 setMethod("checkArgs", "missing",
 function(f = sys.function(1), argNames, args = NULL, forceAll = FALSE, env = sys.frame(1),
-          isMissing = logical(0))
-  checkArgs(f)
-)
+          isMissing = logical(0)) {
+    f = sys.function(-2)
+    env = sys.frame(-2)
+    checkArgs(f, env = env)
+})
 
 setMethod("checkArgs", "function",
 #
@@ -45,7 +47,7 @@ function(f = sys.function(1), argNames, args = NULL, forceAll = FALSE, env = sys
 {
   types = typeInfo(f)
   if(is.null(types)) {
-      warning("There is no type information for the parameters or the return value")
+      warning("TypeInfo could not find parameter or return type information")
       return(TRUE)
   }
 
@@ -59,7 +61,7 @@ function(f = sys.function(1), argNames, args = NULL, forceAll = FALSE, env = sys
          # Degenerate case where there is no information on the parameters
   if(length(types@.Data) == 0) {
     if(!(is.call(types@returnType) || is.expression(types@returnType) || !is.na(types@returnType)) )
-      warning("There is no type information for the parameters or the return value")      
+        warning("TypeInfo could not find parameter or return type information")
 
     return(NULL)
   }
@@ -94,7 +96,7 @@ function(f = sys.function(1), argNames, args = NULL,
     # exception.
     tmp = checkType(args[[i]], f[[i]], env, i)
     if(is.logical(tmp) && !tmp) {
-      cond = paste(i, " of class ", class(args[[i]]), " is not compatible with ", paste(f[[i]], collapse = ", "), sep = "")
+      cond = paste("TypeInfo parameter '", i, "' of class '", class(args[[i]]), "' does not match '", paste(f[[i]], collapse = ", "), "'", sep = "")
       class(cond) = "TypeValidationError"
       stop(cond)
     }
@@ -118,7 +120,7 @@ function(f = sys.function(1), argNames, args = NULL, forceAll = FALSE,
                      else if(tt == "NULL")
                        is.null(args[[x]])
                      else if(is(tt, "NamedTypeTest")) {
-                       checkArguments(tt, args = args, env = env)
+                         checkType( args[[x]], tt, env )
                      }
                      else 
                        is(args[[x]], tt)
@@ -136,7 +138,7 @@ function(f = sys.function(1), argNames, args = NULL, forceAll = FALSE,
     }
   }
 
-  cond = "checkArgs failed to match the call to any of the possible signatures"
+  cond = "TypeInfo failed to match any signature"
   class(cond) = "TypeValidationError"
 
   stop(cond)
@@ -157,7 +159,7 @@ function(f = sys.function(1), argNames, args = NULL, forceAll = FALSE, env = sys
 
 
 checkReturnValue =
-function(value, returnJump, sig = NULL, f = sys.function(1))
+function(returnType, returnJump, sig = NULL, f = sys.function(-1))
 {
   if(!missing(sig) && !is.null(sig) && (is(sig, "TypedSignature") || is(sig, "TypeSpecification")) && !is.na(sig@returnType)) {
      type = sig@returnType
@@ -169,12 +171,12 @@ function(value, returnJump, sig = NULL, f = sys.function(1))
      type = types@returnType
   }
 
-  status = checkType(value, type, sys.frame(1))
+  status = checkType(returnType, type, sys.frame(1))
   if(is.logical(status) && status)
     return(returnJump)
   else {
-     cond = paste("incorrect return type: got '", class(value), ",' but expected '", type, "'", sep = "")
-     class(cond) = c("ReturnTypeValidationError", "error", "condition")     
+     cond = paste("TypeInfo got '", class(returnType), "', expected '", type, "'", sep = "")
+     class(cond) = "ReturnTypeValidationError"
      stop(cond)
   }
 

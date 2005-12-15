@@ -1,4 +1,4 @@
-export(IndependentTypeSpecification, SimultaneousTypeSpecification, ReturnTypeSpecification, TypedSignature)
+export(IndependentTypeSpecification, SimultaneousTypeSpecification, ReturnTypeSpecification, TypedSignature, StrictIsTypeTest, InheritsTypeTest)
 export(checkArgs, checkReturnValue)
 export(typeInfo, "typeInfo<-")
 
@@ -10,7 +10,7 @@ exportClasses("NamedTypeTest", "InheritsTypeTest", "StrictIsTypeTest", "DynamicT
 
 exportClasses("TypedSignature")
 
-exportMethods("coerce", "checkArgs")
+exportMethods("coerce", "checkArgs", "initialize")
 
 # Print methods.
 

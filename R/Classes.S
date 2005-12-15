@@ -13,8 +13,10 @@ setClass("NamedTypeTest", contains = c("character"))# , "VIRTUAL"))
 setClass("InheritsTypeTest", contains = "NamedTypeTest", prototype = as.character(NA))
 setClass("StrictIsTypeTest", contains = "NamedTypeTest", prototype = as.character(NA))
 
-
 setClassUnion("DynamicTypeTest", c("call", "expression"))
+
+InheritsTypeTest = function(class) new("InheritsTypeTest", class)
+StrictIsTypeTest = function(class) new("StrictIsTypeTest", class)
 
 # An object that can be used to perform a test about an object.
 setClassUnion("ClassNameOrExpression",
@@ -28,6 +30,18 @@ setClass("TypeSpecification",
           representation(returnType = "ClassNameOrExpression"),
           prototype = list(returnType = new("InheritsTypeTest")),
           contains = "VIRTUAL")
+
+setMethod("initialize", "TypeSpecification",
+          function( .Object, ..., returnType ) {
+              maybeInheritsTypeTest = function(test) {
+                  if (class(test) == "character")
+                      test = as(test, "InheritsTypeTest" )
+                  test
+              }
+              if (!missing(...))
+                  .Object@.Data = lapply(..., maybeInheritsTypeTest)
+              .Object
+          })
 
 # This represents information about the expected/desired/required
 # types of the specified arguments in a call. It is a list
@@ -146,7 +160,5 @@ function(type, obj = new("ReturnTypeSpecification"))
 
   obj
 }  
-
-
 
 
