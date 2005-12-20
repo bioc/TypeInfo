@@ -1,5 +1,12 @@
 \name{checkArgs}
+\docType{methods}
 \alias{checkArgs}
+\alias{checkArgs-methods}
+\alias{checkArgs,missing-method}
+\alias{checkArgs,function-method}
+\alias{checkArgs,IndependentTypeSpecification-method}
+\alias{checkArgs,SimultaneousTypeSpecification-method}
+\alias{checkArgs,InheritsTypeTest-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Validate the arguments in a call to a typed function.}
 \description{
@@ -31,7 +38,7 @@
 }
 \usage{
 checkArgs(f = sys.function(1), argNames, args = NULL, forceAll = FALSE,
-          env = sys.frame(1))
+          env = sys.frame(1), isMissing = logical(0))
 }
 \arguments{
   \item{f}{the function object. If this is missing, the function is

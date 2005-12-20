@@ -47,21 +47,20 @@ function(f = sys.function(1), argNames, args = NULL, forceAll = FALSE, env = sys
 {
   types = typeInfo(f)
   if(is.null(types)) {
-      warning("TypeInfo could not find parameter or return type information")
+      warning(paste("no TypeInfo available in function '", substitute(f), "'", sep=""))
       return(TRUE)
   }
 
   argNames = names(formals(f))
-  isMissing = sapply(argNames, function(var) {
-                                 eval(substitute(missing(i), list(i = as.name(var))), env)
-                               })
+  isMissing = sapply(argNames, function(var)
+    eval(substitute(missing(i), list(i = as.name(var))), env))
   names(isMissing) = argNames
 
  
-         # Degenerate case where there is no information on the parameters
+  ## Degenerate case where there is no information on the parameters -- can we actually get here?
   if(length(types@.Data) == 0) {
     if(!(is.call(types@returnType) || is.expression(types@returnType) || !is.na(types@returnType)) )
-        warning("TypeInfo could not find parameter or return type information")
+        warning("TypeInfo found 0-length parameter and return type information")
 
     return(NULL)
   }
@@ -82,6 +81,17 @@ function(f = sys.function(1), argNames, args = NULL, forceAll = FALSE, env = sys
 })
 
 
+typeInfoValidationError <- function( obj, args ) {
+  classes = lapply( args, class )
+  cond = paste("\nTypeInfo could not match signature. Supplied\narguments and their classes:\n  ",
+    paste(names(args), ": ", classes, sep="", collapse="\n  "),
+    "\nAvailable signature(s):\n",
+    paste(showTypeInfo( obj, names(args), prefix = "" ), collapse="\n"),
+    sep = "" )
+  class(cond) = "TypeValidationError"
+  stop(cond, call=FALSE)
+}
+
 setMethod("checkArgs", "IndependentTypeSpecification",
 #
 # This checks the arguments in args against the type specification given by f which is
@@ -90,16 +100,13 @@ setMethod("checkArgs", "IndependentTypeSpecification",
 #
 function(f = sys.function(1), argNames, args = NULL,
          forceAll = FALSE, env = sys.frame(1), isMissing = logical(0)) {
-
   for(i in names(f)) {
     # Add in support for checking all the arguments and handling errors to cumulate them into a single
     # exception.
     tmp = checkType(args[[i]], f[[i]], env, i)
-    if(is.logical(tmp) && !tmp) {
-      cond = paste("TypeInfo parameter '", i, "' of class '", class(args[[i]]), "' does not match '", paste(f[[i]], collapse = ", "), "'", sep = "")
-      class(cond) = "TypeValidationError"
-      stop(cond)
-    }
+    browser()
+    if(is.logical(tmp) && !tmp)
+      typeInfoValidationError( f[[i]], args[i] )
   }
   NULL
 })
@@ -138,10 +145,7 @@ function(f = sys.function(1), argNames, args = NULL, forceAll = FALSE,
     }
   }
 
-  cond = "TypeInfo failed to match any signature"
-  class(cond) = "TypeValidationError"
-
-  stop(cond)
+  typeInfoValidationError( f, args )
 }
 )
 
@@ -213,7 +217,6 @@ setMethod("checkType", c(type="InheritsTypeTest"),
               
               any(sapply(type, function(klass) is(value, klass) ))
            })
-
 
 setMethod("checkType", c(type = "DynamicTypeTest"),
            function(value, type, env, name = "") {

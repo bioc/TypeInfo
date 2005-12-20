@@ -106,16 +106,14 @@ Using a typed function is exactly the same as using an untyped function:
 oneWayAnova( weight, group )
 @ 
 When the user supplies incorrect data, e.g., representing the \code{predictor} as \code{numeric} rather than \code{factor}
-<<sgroup, eval=FALSE>>=
+<<sgroup>>=
 ngroup <- as.numeric( group )
-oneWayAnova( weight, ngroup )
+res <- try( oneWayAnova( weight, ngroup ))
 @ 
 \TypeInfo{} intervenes with an error:
-\begin{verbatim}
-Error in checkArgs(types, args = args, 
-  env = env, isMissing) : 
-    TypeInfo failed to match any signature
-\end{verbatim}
+<<sgroupErr, echo=FALSE>>=
+cat( res[[1]] )
+@ 
 This is helpful, as our user might otherwise have performed a linear regression rather than fixed-effects ANOVA.
 
 We might decide that, for our purposes, the \code{predictor} can be \code{factor} or \code{numeric}.

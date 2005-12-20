@@ -1,7 +1,13 @@
 \name{hasParameterType}
+\docType{methods}
 \alias{hasParameterType}
+\alias{hasParameterType,NamedTypeTest-method}
+\alias{hasParameterType,SimultaneousTypeSpecification-method}
+\alias{hasParameterType,TypeSpecification-method}
+\alias{hasParameterType,IndependentTypeSpecification-method}
 \alias{hasReturnType}
-
+\alias{hasReturnType,TypeSpecification-method}
+\alias{hasReturnType,SimultaneousTypeSpecification-method}
 \alias{hasParameterType,function-method}
 \alias{hasReturnType,function-method}
 

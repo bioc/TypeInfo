@@ -19,10 +19,10 @@
   and the value returned.
 }
 \usage{
-checkReturnValue(value, returnJump, sig, f = sys.function(1))
+checkReturnValue(returnType, returnJump, sig, f = sys.function(-1))
 }
 \arguments{
-  \item{value}{the value to be returned that is to be validated.}
+  \item{returnType}{the specifiedtype of the return value.}
   \item{returnJump}{this is a very special value which is a call to
     return the value of \code{value}. It must be explicitly given
     in the call to \code{checkReturnValue} and is used

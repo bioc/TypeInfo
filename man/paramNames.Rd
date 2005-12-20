@@ -1,8 +1,13 @@
 \name{paramNames}
+\docType{methods}
 \alias{paramNames}
-\alias{paramNames,SimultaneousTypeSpecification}
-\alias{paramNames,IndependentTypeSpecification}
-\alias{paramNames,function}
+\alias{paramNames,SimultaneousTypeSpecification-method}
+\alias{paramNames,IndependentTypeSpecification-method}
+\alias{paramNames,TypeSpecification-method}
+\alias{paramNames,NamedTypeTest-method}
+\alias{paramNames,TypedSignature-method}
+\alias{paramNames,ReturnTypeSpecification-method}
+\alias{paramNames,function-method}
 \title{Compute the names of all the specified parameters in a TypeSpecification object}
 \description{
   This generic function has methods  for computing the names of

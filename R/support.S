@@ -1,27 +1,20 @@
 setGeneric("paramNames",
-            function(def) {
-              standardGeneric("paramNames")
-            })
+            function(def) standardGeneric("paramNames"))
 
 setMethod("paramNames", "SimultaneousTypeSpecification",
-           function(def) {
-             unique(as.character(sapply(def, names)))
-           })
+           function(def) unique(as.character(sapply(def, names))))
 
 setMethod("paramNames", "IndependentTypeSpecification",
-           function(def) {
-             names(def)
-           })
+           function(def) names(def))
+
+setMethod("paramNames", "TypedSignature",
+          function(def) names(def))
 
 setMethod("paramNames", "ReturnTypeSpecification",
-           function(def) {
-              character(0)
-           })
-
+           function(def) character(0))
 
 setMethod("paramNames", "function",
-           function(def)
-             names(formals(def)))
+           function(def) names(formals(def)))
           
 
 
@@ -37,21 +30,22 @@ function(func, value, rewrite = TRUE)
 {
 
    if(is(func, "genericFunction"))
-     stop("Type information for a function is not supported for generic functions. The type information comes from methods. The return type will be handled in the future directly by the setGeneric and setMethod functions.")
-
+     stop("applying TypeInfo to generic functions not supported")
   
    if(rewrite) {
      if(is.null(attr(func, "TypeInfo")) && is.null(attr(func, "originalSource")))
         func = rewriteTypeCheck(func,  doReturn = hasReturnType(value), checkArgs = hasParameterType(value)) 
      else
-        warning("Looks like we have already done the rewrite of the body of the function")
+        warning("redefine and reapply TypeInfo to ensure intended type checking")
    }
-   
+
   ids = paramNames(value)
   if(length(ids) != 0) {
-      m = match(ids, names(formals(func)))
+      m = match(ids, paramNames(func))
       if(any(is.na(m)))
-        stop("names of parameters in type specification don't match formal parameter names: ", paste(ids[is.na(m)]))
+        stop(paste("typed parameter(s) '", paste( ids[is.na(m)], collapse="', '"),
+                   "' do not match named parameter(s) '", paste(paramNames(func), collapse="', '" ),
+                   "'", sep="" ))
   }
 
   attr(func, "TypeInfo") = value

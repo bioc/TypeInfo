@@ -2,7 +2,8 @@ export(IndependentTypeSpecification, SimultaneousTypeSpecification, ReturnTypeSp
 export(checkArgs, checkReturnValue)
 export(typeInfo, "typeInfo<-")
 
-export(rewriteTypeCheck, paramNames)
+export(paramNames)
+## export(rewriteTypeCheck)
 
 exportClasses("TypeSpecification", "IndependentTypeSpecification", "SimultaneousTypeSpecification", "ReturnTypeSpecification")
 
@@ -10,12 +11,17 @@ exportClasses("NamedTypeTest", "InheritsTypeTest", "StrictIsTypeTest", "DynamicT
 
 exportClasses("TypedSignature")
 
-exportMethods("coerce", "checkArgs", "initialize")
+exportMethods("coerce", "checkArgs", "showTypeInfo")
+exportMethods("initialize")
 
 # Print methods.
 
-S3method("print", InheritsTypeTest)
-S3method("print", StrictIsTypeTest)
+## S3method("print", InheritsTypeTest)
+## S3method("print", StrictIsTypeTest)
+
+S3method("print", IndependentTypeSpecification)
+S3method("print", SimultaneousTypeSpecification)
+S3method("print", TypedSignature)
 
 export(hasParameterType, hasReturnType)
 

@@ -33,13 +33,10 @@ setClass("TypeSpecification",
 
 setMethod("initialize", "TypeSpecification",
           function( .Object, ..., returnType ) {
-              maybeInheritsTypeTest = function(test) {
-                  if (class(test) == "character")
-                      test = as(test, "InheritsTypeTest" )
-                  test
-              }
               if (!missing(...))
                   .Object@.Data = lapply(..., maybeInheritsTypeTest)
+              if (!missing( returnType ))
+                  .Object@returnType = maybeInheritsTypeTest( returnType )
               .Object
           })
 
@@ -57,9 +54,7 @@ setClass("TypedSignature",
 
 
 setAs("character", "NamedTypeTest",
-       function(from) {
-           new("InheritsTypeTest", from)
-       })
+       function(from) new( "InheritsTypeTest", from ))
 
 
 # A constructor function for the class TypedSignature.
@@ -69,11 +64,11 @@ function(..., returnType, obj = new("TypedSignature", list(...)))
   if(!missing(obj))
      obj@.Data = list(...)
 
-  if(!missing(returnType)) {
-     if(is.character(returnType))
-         returnType = new("InheritsTypeTest", returnType)
-     obj@returnType = returnType
-  }
+  if(length(obj) != 0 && any(is.null(names(obj))))
+     stop("all TypedSignature elements must be named")
+
+  if(!missing(returnType))
+    obj@returnType = maybeInheritsTypeTest( returnType )
 
   obj
 }
@@ -86,11 +81,8 @@ function(..., returnType, .obj)
   if(!missing(obj))
      .obj@.Data = list(...)
 
-  if(!missing(returnType)) {
-      if(is.character(returnType))
-         returnType = new("InheritsTypeTest", returnType)
-     .obj@returnType = returnType
-   }
+  if(!missing(returnType))
+    .obj@returnType = ReturnTypeSpecification( returnType )
 
   .obj
 }
@@ -106,11 +98,8 @@ function(..., returnType, obj = new("SimultaneousTypeSpecification", list(...)))
   if(!missing(obj))
      obj@.Data = list(...)
 
-  if(!missing(returnType)) {
-     if(is.character(returnType))
-         returnType = new("InheritsTypeTest", returnType)    
-     obj@returnType = returnType
-   }
+  if(!missing(returnType))
+    obj@returnType = maybeInheritsTypeTest( returnType )
 
   obj
 }    
@@ -131,21 +120,25 @@ function(..., returnType, obj = new("IndependentTypeSpecification", list(...)))
   if(!missing(obj)) 
      obj@.Data = list(...)
 
-  if(length(names(obj)) == 0 || any(names(obj) == "")) {
-     stop("All elements must be named, and correspond to a parameter name")
-  }
+  if(length(obj) != 0 && any(is.null(names(obj))))
+     stop("all IndependentTypeSpecification elements must be named")
   
-  obj@.Data = lapply(obj, function(el) { if(is.character(el) && !is(el, "NamedTypeTest")) as(el, "InheritsTypeTest") else el})
+  obj@.Data = lapply(obj,
+    function(el) { if(is.character(el) && !is(el, "NamedTypeTest")) as(el, "InheritsTypeTest") else el})
 
-  if(!missing(returnType)) {
-      if(is.character(returnType))
-         returnType = new("InheritsTypeTest", returnType)
-     obj@returnType = returnType
-   }
+  if(!missing(returnType))
+    obj@returnType = maybeInheritsTypeTest( returnType )
 
   obj
 }
 
+
+maybeInheritsTypeTest =
+function( type ) {
+  if(is.character(type) && !is(type, "NamedTypeTest"))
+    type = new("InheritsTypeTest", type)
+  type
+}
 
 setClass("ReturnTypeSpecification",
           contains = c("TypeSpecification"))  # no need for list.
@@ -153,11 +146,7 @@ setClass("ReturnTypeSpecification",
 ReturnTypeSpecification =
 function(type, obj = new("ReturnTypeSpecification"))
 {
-  if(is.character(type) && !is(type, "NamedTypeTest"))
-    type = new("InheritsTypeTest", type)
-
-  obj@returnType = type
-
+  obj@returnType = maybeInheritsTypeTest( type )
   obj
 }  
 

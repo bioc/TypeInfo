@@ -5,8 +5,6 @@
 \alias{TypeSpecification-class}
 \alias{ReturnTypeSpecification-class}
 
-\alias{paramNames,IndependentTypeSpecification-method}
-
 \title{Class "TypeSpecification" and derived class}
 \description{
   The classes in this  collection are used to represent

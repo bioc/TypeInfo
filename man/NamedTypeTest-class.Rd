@@ -4,6 +4,8 @@
 \alias{InheritsTypeTest-class}
 \alias{StrictIsTypeTest-class}
 \alias{coerce,character,NamedTypeTest-method}
+\alias{InheritsTypeTest}
+\alias{StrictIsTypeTest}
 
 \title{Class "NamedTypeTest" and sub-classes for tests on class of an object. }
 \description{
@@ -16,10 +18,11 @@
   The first of these is represented by \code{InheritsTypeTest}
   and the second by \code{StrictTypeTest}.
 }
-\section{Objects from the Class}{
+\section{Objects from the NamedTypeTest class}{
  Objects can be created for the non-virtual classes
  using \code{new("InheritsTypeTest",...)}
- and \code{new("StrictIsTypeTest",...)}
+ and \code{new("StrictIsTypeTest",...)} or the convenience functions
+ \code{InheritsTypeTest(...)}, \code{StrictIsTypeTest(...)}
  Additionally,  where appropriate,
  a character vector is coerced  to \code{InheritsTypeTest}.
 }

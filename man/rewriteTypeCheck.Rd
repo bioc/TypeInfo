@@ -12,7 +12,7 @@
   via \code{\link{checkArgs}}.
 }
 \usage{
-rewriteTypeCheck(f, doReturn = TRUE, checkArgs = TRUE)
+rewriteTypeCheck(f, doReturn = TRUE, checkArgs = TRUE, addInvisible = FALSE)
 }
 
 \arguments{
@@ -28,7 +28,9 @@ rewriteTypeCheck(f, doReturn = TRUE, checkArgs = TRUE)
     should including check the arguments. If the only type information
     given is about the return type, no checking of the arguments is
     necessary (in the current model).
-   }
+  }
+ \item{addInvisible}{logical indicating whether returned argument needs
+   to be cloaked in \code{invisible}.}
 }
 \details{
 
