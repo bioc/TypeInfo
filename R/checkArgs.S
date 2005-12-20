@@ -83,13 +83,14 @@ function(f = sys.function(1), argNames, args = NULL, forceAll = FALSE, env = sys
 
 typeInfoValidationError <- function( obj, args ) {
   classes = lapply( args, class )
-  cond = paste("\nTypeInfo could not match signature. Supplied\narguments and their classes:\n  ",
+  cond = paste(
+    "\nTypeInfo could not match signature. Supplied arguments and their classes:\n  ",
     paste(names(args), ": ", classes, sep="", collapse="\n  "),
     "\nAvailable signature(s):\n",
-    paste(showTypeInfo( obj, names(args), prefix = "" ), collapse="\n"),
+    paste(showTypeInfo( obj, names(args), prefix = "  " ), collapse="\n"),
     sep = "" )
   class(cond) = "TypeValidationError"
-  stop(cond, call=FALSE)
+  stop(cond)
 }
 
 setMethod("checkArgs", "IndependentTypeSpecification",
