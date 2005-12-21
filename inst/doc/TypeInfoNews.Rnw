@@ -47,7 +47,7 @@ We start with straight-forward ways of applying type information.
 Then we illustrate the flexibility of \TypeInfo{} for apply complicated type checks, including types satisfying arbitrary \R{} expressions.
 The article concludes with a brief look behind the scenes to expose limitations of \TypeInfo{}, and to highlight opportunities for using typed functions in advanced aspects of your own work.
 
-\section*{The basics: applying \command{typeInfo}}
+\section{The basics: applying \command{typeInfo}}
 Suppose your colleagues clamor for a function to perform one-way analysis of variance on data where the predictor is a \code{factor}.
 Easily done in \R{} with \code{lm}, but the \R{} formula notation might be more than needed for our simple function.
 To help our colleagues, we simplify the interface to refer to \code{response} and \code{predictor} variables.
@@ -71,7 +71,7 @@ weight <- c(ctl, trt)
 oneWayAnova( weight, group )
 @ 
 
-\subsection*{Applying type checks}
+\subsection{Applying type checks}
 We want to make sure our users enter the right kinds of arguments.
 To do this, we add type information to make sure that \code{response} is \code{numeric}, and \code{predictor} a \code{factor}.
 We start by loading the \TypeInfo{} library\ldots
@@ -106,7 +106,7 @@ Using a typed function is exactly the same as using an untyped function:
 oneWayAnova( weight, group )
 @ 
 
-\subsection*{Finding out about type information}
+\subsection{Finding out about type information}
 
 Once applied, functions can be queried with \command{typeInfo}.
 <<introspection, eval=FALSE>>=
@@ -130,7 +130,7 @@ Each \TypedSignature{} is a list with entries for each element with type specifi
 The information returned from \command{typeInfo} provides useful information as-is.
 It can also be parsed by computer code to provide information useful in creation of graphical widgets or other interfaces.
 
-\subsection*{Incorrect arguments}
+\subsection{Incorrect arguments}
 
 When the user supplies incorrect data, e.g., representing the \code{predictor} as \code{numeric} rather than \code{factor}
 <<sgroup, eval=FALSE>>=
@@ -140,7 +140,7 @@ res <- try( oneWayAnova( weight, ngroup ))
 \TypeInfo{} intervenes with the error show in Figure~\ref{fig:TypeInfoOutput}.
 Providing \TypeInfo{} is helpful, as our user might otherwise have performed a linear regression rather than fixed-effects ANOVA.
 
-\subsection*{Elaborating on type signatures}
+\subsection{Elaborating on type signatures}
 We might decide that, for our purposes, the \code{predictor} can be either \code{factor} or \code{numeric}.
 We change the \STS{} to include another \TypedSignature{} (re-applying \command{typeInfo} does \emph{not} automatically overwrite previous type specifications, so we must use \command{typeInfo} on a fresh version of \code{oneWayAnova}):
 <<echo=FALSE>>=
@@ -175,13 +175,13 @@ On the other hand, each \TypedSignature{} specifies conditions that must all app
 \TypedSignature{} performs a logical AND on its elements.
 In the example here, regardless of argument type, the function returns an object of class \code{anova}.
 
-\section*{Flexible \TypeInfo{}}
+\section{Flexible \TypeInfo{}}
 
 The presentation so far emphasizes the sort of basic type specification that is likely to be most useful when making \R{} functions available to other programming languages.
 \TypeInfo{} offers a range of methods for validating type that can be very useful for \R{} programmers, but that employ concepts not readily translated into other languages.
 A sampling of these are presented here, along with additional detail about the application of type specification .
 
-\subsection*{More on type tests}
+\subsection{\ITT{}}
 
 Notice in the example above that arguments are labeled with character strings of type names.
 A type specification of class \code{character} corresponds to an \ITT{}, as indicated explicitly for the \code{returnType} specification.
@@ -193,6 +193,7 @@ iweight <- as.integer( weight )
 oneWayAnova( iweight, group )
 @ 
 
+\subsection{\STT{} and \DTT{}}
 What other ways does \TypeInfo{} offer to specify type?
 \STT{} requires an exact match between the class of an object and the specified class(es).
 To specifying a strict match for \code{response} and \code{returnValue}, but an inherited match for \code{predictor}, write
@@ -235,11 +236,13 @@ oneWayAnova(short, group)   # ERROR
 Note that the expression in \DTT{} has access to argument names, and uses \command{quote} to protect premature evaluation.
 \DTT{} can also be used in the return statement.
 
+\subsection{Return types}
+
 As written here, the \code{returnType} applies to all \TypedSignature's.
 That is, the function always returns an \code{anova} object, regardless of argument type.
 Actually, each \TypedSignature{} can have its own \code{returnType}, allowing for a return type that depends on argument type.
 
-\subsection*{IndependentTypeSpecification}
+\subsection{\ITS{}}
 
 We saw how several \TypedSignature{} statements allow different types for \code{predictor}.
 \ITS{} provides another mechanism to specifying alternative types:
@@ -260,7 +263,7 @@ typeInfo(oneWayAnova) <-
 \ITS{} expects a list of argument names, each with a character vector of possible types.
 While \STS{} performs a logical OR across each \TypedSignature{}, \ITS{} performs logical OR within arguments.
 
-\section*{Behind the scenes: opportunities and limitations of \TypeInfo{}}
+\section[Behind the scenes]{Behind the scenes: \TypeInfo{} limitations and opportunities}
 
 Several aspects of \TypeInfo{} provide opportunities for creative application.
 Type tests in \TypeInfo{} form a hierarchy of S4 classes.
@@ -282,7 +285,7 @@ The extra code requires evaluation, slowing execution and making \TypeInfo{} ina
 In such situation, present a public type-checked `wrapper' to help ensures only correct argument types reach the speed-critical functions.
 \TypeInfo{} does not usually have side-effects, but a poorly written \DTT{} could alter argument or return values unexpectedly.
 
-\section*{Final hints and tips}
+\section{Final hints and tips}
 
 We have seen how \TypeInfo{} provides reflection, annotating function definitions with information to check argument types.
 The reflection provided by \TypeInfo{} has several advantages.

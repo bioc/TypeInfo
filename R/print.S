@@ -1,15 +1,6 @@
 setGeneric("showTypeInfo",
            function( object, name = character(), prefix = "", ... ) standardGeneric("showTypeInfo"))
 
-.showTypeInfoReturnType <- function( object, name = "returnType", prefix = "" ) {
-  if (!is.na(object@returnType))
-    showTypeInfo( object@returnType, name, prefix)
-  else
-    NULL
-}
-
-.prefixIncr <- function( s ) return( paste( s, "  ", sep = "" ))
-
 setMethod("showTypeInfo",
           signature( object = "ANY" ),
           function( object, name = character(), prefix = "" ) {
@@ -29,8 +20,8 @@ setMethod("showTypeInfo",
             c(paste( prefix, "[IndependentTypeSpecification]", sep = "" ),
               unlist( sapply(seq( along = object ),
                              function(i) showTypeInfo( object[[i]], name[[i]],
-                                                      prefix = .prefixIncr( prefix )))),
-              .showTypeInfoReturnType( object, prefix = .prefixIncr( prefix )))
+                                                      prefix = prefixIncr( prefix )))),
+              showTypeInfoReturnType( object, prefix = prefixIncr( prefix )))
           })
 
 setMethod("showTypeInfo",
@@ -38,8 +29,8 @@ setMethod("showTypeInfo",
           function( object, name = character(), prefix = "" ) {
             c(paste( prefix, "[SimultaneousTypeSpecification]", sep = "" ),
               unlist( sapply(seq( along = object ),
-                             function(i) showTypeInfo(object[[i]], prefix = .prefixIncr( prefix )))),
-              .showTypeInfoReturnType( object, prefix = .prefixIncr( prefix )))
+                             function(i) showTypeInfo(object[[i]], prefix = prefixIncr( prefix )))),
+              showTypeInfoReturnType( object, prefix = prefixIncr( prefix )))
           })
 
 setMethod("showTypeInfo",
@@ -49,8 +40,8 @@ setMethod("showTypeInfo",
             c(paste(prefix, "[TypedSignature]", sep = ""),
               as.vector( sapply(1:length(object),
                                 function(i) showTypeInfo(object[[i]], name[[i]],
-                                                         prefix = .prefixIncr( prefix )))),
-              .showTypeInfoReturnType( object, prefix = .prefixIncr( prefix )))
+                                                         prefix = prefixIncr( prefix )))),
+              showTypeInfoReturnType( object, prefix = prefixIncr( prefix )))
           })
 
 setMethod("showTypeInfo",
@@ -81,14 +72,31 @@ setMethod("showTypeInfo",
                   as.expression( object ), " [DynamicTypeTest]", sep = "")
           })
 
-print.IndependentTypeSpecification <- function( x, ... )
+print.IndependentTypeSpecification =
+function( x, ... )
   cat( showTypeInfo( x ), sep="\n")
 
-print.SimultaneousTypeSpecification <- function( x, ... )
+print.SimultaneousTypeSpecification =
+function( x, ... )
   cat( showTypeInfo( x ), sep="\n")
 
-print.TypedSignature <- function( x, ... )
+print.TypedSignature =
+function( x, ... )
   cat( showTypeInfo( x ), sep="\n")
+
+
+## showTypeInfo utility functions
+
+showTypeInfoReturnType =
+function( object, name = "returnType", prefix = "" ) {
+  if (!is.na(object@returnType))
+    showTypeInfo( object@returnType, name, prefix)
+  else
+    NULL
+}
+
+prefixIncr =
+function( s ) return( paste( s, "  ", sep = "" ))
 
 ## print.InheritsTypeTest =
 ## function(x, ...) {

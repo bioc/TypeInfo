@@ -16,9 +16,6 @@ setMethod("paramNames", "ReturnTypeSpecification",
 setMethod("paramNames", "function",
            function(def) names(formals(def)))
           
-
-
-
 typeInfo =
 function(func)
 {
@@ -53,6 +50,19 @@ function(func, value, rewrite = TRUE)
   func
 }
 
+typeInfoValidationError =
+function( obj, args ) {
+  classes = lapply( args, class )
+  cond = paste(
+    "TypeInfo could not match signature.\n",
+    "Supplied arguments and their types:\n  ",
+    paste(names(args), ": ", classes, sep="", collapse="\n  "),
+    "\nAvailable signature(s):\n",
+    paste(showTypeInfo( obj, names(args), prefix = "  " ), collapse="\n"),
+    sep = "" )
+  class(cond) = "TypeValidationError"
+  stop(cond, call. = FALSE)
+}
 
 
 setGeneric("hasReturnType", function(def) standardGeneric("hasReturnType"))
