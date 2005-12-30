@@ -38,9 +38,9 @@ setMethod("showTypeInfo",
           function( object, name = character(), prefix = "" ) {
             name <- paramNames( object )
             c(paste(prefix, "[TypedSignature]", sep = ""),
-              as.vector( sapply(1:length(object),
-                                function(i) showTypeInfo(object[[i]], name[[i]],
-                                                         prefix = prefixIncr( prefix )))),
+              unlist( sapply(seq( along = object ),
+                             function(i) showTypeInfo(object[[i]], name[[i]],
+                                                      prefix = prefixIncr( prefix )))),
               showTypeInfoReturnType( object, prefix = prefixIncr( prefix )))
           })
 
@@ -89,7 +89,7 @@ function( x, ... )
 
 showTypeInfoReturnType =
 function( object, name = "returnType", prefix = "" ) {
-  if (!is.na(object@returnType))
+  if (length( object@returnType ) > 1 || !is.na( object@returnType ))
     showTypeInfo( object@returnType, name, prefix)
   else
     NULL
