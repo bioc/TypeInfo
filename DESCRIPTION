@@ -23,6 +23,7 @@ SaveImage: true
 Depends: methods
 Warning:  One gets a warning from R CMD check about the parameter 'value' of the function
     'typeInfo<-' function. This function is correct; the test is flawed.
+biocViews: Infrastructure
 
 
        
