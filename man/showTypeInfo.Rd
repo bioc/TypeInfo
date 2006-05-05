@@ -10,18 +10,24 @@
 \alias{showTypeInfo,StrictIsTypeTest-method}
 \alias{showTypeInfo,DynamicTypeTest-method}
 \title{Display information about argument types}
+
 \description{
   This generic function returns type specifications as a list.
   Elements in the list contain information about different parts of the
   signature. The order and white spece of the list suggests structure of
   the type specification.
+
+  \code{showTypeInfo} is usually invoked with a single argument, the
+  name of the function with type information. 
 }
+
 \usage{
-showTypeInfo(object, ...)
+showTypeInfo(object, name=character(), prefix="", ...)
 }
 \arguments{
   \item{object}{The object about which type information is required}
-  \item{...}{Additional arguments used for derivatives of \code{NamedTypeTest}.}
+  \item{name}{Class name, not normally specified by user.}
+  \item{...}{Additional arguments used for derivatives of \code{NamedTypeTest}, not noramlly assigned by user.}
 }
 \details{
 }

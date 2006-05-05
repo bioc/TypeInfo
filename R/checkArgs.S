@@ -92,7 +92,6 @@ function(f = sys.function(1), argNames, args = NULL,
     # Add in support for checking all the arguments and handling errors to cumulate them into a single
     # exception.
     tmp = checkType(args[[i]], f[[i]], env, i)
-    browser()
     if(is.logical(tmp) && !tmp)
       typeInfoValidationError( f[[i]], args[i] )
   }
@@ -187,7 +186,9 @@ function(returnType, returnJump, sig = NULL, f = sys.function(-1))
 # "TypeSpecification"
 # "TypedSignature"               
 
-setGeneric("checkType", function(value, type, env, name = "") standardGeneric("checkType"))
+setGeneric("checkType",
+           function(value, type, env, name = "") standardGeneric("checkType"),
+           valueClass = "logical")
 
 
 setMethod("checkType", c(type = "StrictIsTypeTest"),

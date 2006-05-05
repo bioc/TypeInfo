@@ -1,7 +1,7 @@
-if(require(Biobase)) {
-  copySubstitute <- Biobase::copySubstitute
-} else
-  source("~/Download/Biobase/R/tools.R")
+library(TypeInfo)
+require(Biobase)
+copySubstitute <- Biobase::copySubstitute
+
 
 typeInfo( copySubstitute ) <-
     IndependentTypeSpecification(
@@ -14,7 +14,7 @@ typeInfo( copySubstitute ) <-
             allowUnresolvedSymbols = "logical" ,
             recursive = "logical" ,
             removeExtension = "character",
-            returnType = "character")
+            returnType = "NULL")
 
 
 infile  = tempfile()
@@ -33,4 +33,7 @@ copySubstitute(infile, outfile, z)
 
 cat("Next call should be an error\n")
 ## should be caught, but is not
-copySubstitute(123, outfile, z)
+tryCatch({
+  copySubstitute(123, outfile, z);
+  stop("should have caught that!")
+  }, error=function(err) {})
