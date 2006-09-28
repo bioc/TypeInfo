@@ -1,5 +1,5 @@
 Package: TypeInfo
-Version: 0.3.1
+Version: 0.99.1
 Date: 9/27/2005
 Title: Optional Type Specification Prototype
 Author: Duncan Temple Lang
@@ -21,8 +21,6 @@ License: BSD
 LazyLoad: true
 SaveImage: true
 Depends: methods
-Warning:  One gets a warning from R CMD check about the parameter 'value' of the function
-    'typeInfo<-' function. This function is correct; the test is flawed.
 biocViews: Infrastructure
 
 

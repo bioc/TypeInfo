@@ -11,12 +11,11 @@
 }
 \usage{
 typeInfo(func)
-"typeInfo<-"(func, value, rewrite = TRUE)
+"typeInfo<-"(func, rewrite = TRUE, value)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{func}{the function whose type information is to be accessed}
-  \item{value}{an object of class \code{\link{TypeSpecification-class}}}
   \item{rewrite}{a logical value. This controls whether the body of the
     function \code{func} is rewritten so that checks for the arguments
     and return type are added to the code and the appropriate
@@ -24,6 +23,7 @@ typeInfo(func)
     This is necessary to get calls to \code{return} in the function
     to behave correctly and allow the return value to be validated.
   }
+  \item{value}{an object of class \code{\link{TypeSpecification-class}}}
 }
 \details{
 

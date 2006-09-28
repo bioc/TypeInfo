@@ -7,9 +7,11 @@
 \alias{checkArgs,IndependentTypeSpecification-method}
 \alias{checkArgs,SimultaneousTypeSpecification-method}
 \alias{checkArgs,InheritsTypeTest-method}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{Validate the arguments in a call to a typed function.}
 \description{
+  \code{TypeInfo} uses \code{checkArgs} internally.
+
   This function is used to validate the arguments in a call
   to a function that has associated type information about the
   parameters.  The types for the parameters are currently
@@ -57,10 +59,11 @@ checkArgs(f = sys.function(1), argNames, args = NULL, forceAll = FALSE,
      signatures and evaluate all of the arguments now.
    }
    \item{env}{the environment in which arguments are located.}
+   \item{isMissing}{named logical vector indicating missing formal
+       arguments; defined internally when consulting \code{f} of class
+       \code{function}}.
 }
-\details{
-
-}
+\details{}
 \value{
   If the check succeeds in matching the arguments to the parameter types,
   the signature that matched is returned.
@@ -79,30 +82,19 @@ checkArgs(f = sys.function(1), argNames, args = NULL, forceAll = FALSE,
   what they want to have happen. We could use the S4 signature
   matching technique when this is finalized and implemented in C code.
 }
-\references{}
 \author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
-\note{This is intended to be a prototype.
-  We need to define methods or dispatch differently at least for
-  different types of signature specification, i.e. the simultaneous
-  constraints and the independent constraint.
-}
 
 \seealso{
  \code{\link{typeInfo}}
 }
 \examples{
+bob = function(x, y) {
+        checkArgs()  # Completely unecessary as we don't specify type information.
+        "Finished"
+      }
 
-
-
-
- bob = function(x, y) {
-         checkArgs()  # Completely unecessary as we don't specify type information.
-         "Finished"
-       }
-
-  # a call generates a warning to say that there was no type information.
- bob()  
-
+ # a call generates a warning to say that there was no type information.
+bob()
 }
 \keyword{programming}
 \keyword{interface}

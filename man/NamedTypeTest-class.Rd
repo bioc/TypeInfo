@@ -7,7 +7,7 @@
 \alias{InheritsTypeTest}
 \alias{StrictIsTypeTest}
 
-\title{Class "NamedTypeTest" and sub-classes for tests on class of an object. }
+\title{Class "NamedTypeTest" and sub-classes for tests on class of an object.}
 \description{
   These classes are for specifying a test on the type of an object
   using the class of that object and comparing it to target class
@@ -54,7 +54,8 @@ Class \code{"vector"}, by class \code{"character"}.
 
 \seealso{
   \code{\link{TypedSignature}}
-  \code{\link{TypeSpecification-class}}  
+  \code{\link{TypeSpecification-class}}
+  \code{\link{DynamicTypeTest-class}}
 }
 \examples{
   new("InheritsTypeTest",  c("A", "B"))

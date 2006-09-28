@@ -23,9 +23,8 @@ function(func)
 }
 
 "typeInfo<-" =
-function(func, value, rewrite = TRUE)
+function(func, rewrite = TRUE, value)
 {
-
    if(is(func, "genericFunction"))
      stop("applying TypeInfo to generic functions not supported")
   

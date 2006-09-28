@@ -1,5 +1,8 @@
 setGeneric("showTypeInfo",
-           function( object, name = character(), prefix = "", ... ) standardGeneric("showTypeInfo"))
+           ## methods should have a named arguemnt 'prefix' to arrange
+           ## for pretty indentation, and should include 'prefix' in
+           ## any calls to showTypeInfo
+           function( object, name = character(), prefix="", ... ) standardGeneric("showTypeInfo"))
 
 setMethod("showTypeInfo",
           signature( object = "ANY" ),

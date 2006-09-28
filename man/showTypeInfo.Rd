@@ -27,6 +27,7 @@ showTypeInfo(object, name=character(), prefix="", ...)
 \arguments{
   \item{object}{The object about which type information is required}
   \item{name}{Class name, not normally specified by user.}
+  \item{prefix}{Used by methods to ensure pretty indentation type specifications.}
   \item{...}{Additional arguments used for derivatives of \code{NamedTypeTest}, not noramlly assigned by user.}
 }
 \details{
