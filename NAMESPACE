@@ -1,3 +1,4 @@
+import(methods)
 export(IndependentTypeSpecification, SimultaneousTypeSpecification, ReturnTypeSpecification, TypedSignature, StrictIsTypeTest, InheritsTypeTest)
 export(checkArgs, checkReturnValue)
 export(typeInfo, "typeInfo<-")
