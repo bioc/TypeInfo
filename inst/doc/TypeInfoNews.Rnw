@@ -22,7 +22,7 @@
 \begin{article}
 
 <<echo=FALSE>>=
-options(width=50)
+options(width=45)
 @ 
 
 \title{Type specification for your functions}
@@ -76,7 +76,7 @@ oneWayAnova <- function( response, predictor ) {
 }
 copyOfOneWayAnova <- oneWayAnova
 @ 
-
+% 
 We make a copy of the function definition to conveniently re-apply
 different type information, as will become apparent below.  To test
 our function, we use data from the help page for \command{lm}:
@@ -99,10 +99,10 @@ loading the \TypeInfo{} library\ldots
 <<>>=
 library(TypeInfo)
 @ 
-
+% 
 and, after defining \code{oneWayAnova},  add type information:
-
-<<echo=FALSE>>=
+% 
+<<keep.source=TRUE,eval=TRUE,results=hide>>=
 typeInfo(oneWayAnova) <-
   SimultaneousTypeSpecification(
     TypedSignature(
@@ -110,15 +110,7 @@ typeInfo(oneWayAnova) <-
       predictor = "factor"),
     returnType = "anova")
 @ 
-
-\begin{verbatim}
-typeInfo(oneWayAnova) <-
-  SimultaneousTypeSpecification(
-    TypedSignature(
-      response = "numeric",
-      predictor = "factor"),
-    returnType = "anova")
-\end{verbatim}
+% 
 
 The command \STS{} means that we want to impose a set of conditions
 that apply simultaneously to all arguments (and, optionally, the
@@ -130,7 +122,7 @@ really does return this type.  The reason for placing
 \code{returnType} after \TypedSignature{} is clarified below.
 
 Using a typed function is exactly the same as using an untyped function:
-
+% 
 <<typedFunc>>=
 oneWayAnova( weight, group )
 @ 
@@ -145,8 +137,12 @@ typeInfo(oneWayAnova)
 <<typeInfoOutupt>>=
 typeInfo(oneWayAnova)
 ngroup <- as.numeric( group )
-res <- try( oneWayAnova( weight, ngroup ))
-cat( res[[1]] )
+res <- 
+    tryCatch(oneWayAnova( weight, ngroup ),
+             error=function(err) {
+                 cat("Error:", 
+                     conditionMessage(err), "\n")
+             })
 @ 
   \caption{Finding out about type information, and the informative
   consequences of supplying incorrect arguments.}
@@ -169,12 +165,12 @@ interfaces.
 
 When the user supplies incorrect data, e.g., representing the
 \code{predictor} as \code{numeric} rather than \code{factor} 
-
+% 
 <<sgroup, eval=FALSE>>=
 ngroup <- as.numeric( group )
 res <- try( oneWayAnova( weight, ngroup ))
 @ 
-
+% 
 \TypeInfo{} intervenes with the error show in
 Figure~\ref{fig:TypeInfoOutput}.  Providing \TypeInfo{} is helpful, as
 our user might otherwise have performed a linear regression rather
@@ -187,8 +183,8 @@ either \code{factor} or \code{numeric}.  We change the \STS{} to
 include another \TypedSignature{} (re-applying \command{typeInfo} does
 \emph{not} automatically overwrite previous type specifications, so we
 must use \command{typeInfo} on a fresh version of \code{oneWayAnova}):
- 
-<<echo=FALSE>>=
+% 
+<<keep.source=TRUE>>=
 oneWayAnova <- copyOfOneWayAnova
 typeInfo(oneWayAnova) <-
   SimultaneousTypeSpecification(
@@ -200,19 +196,6 @@ typeInfo(oneWayAnova) <-
       predictor = "numeric"),
     returnType = "anova")
 @ 
-
-\begin{verbatim}
-oneWayAnova <- copyOfOneWayAnova
-typeInfo(oneWayAnova) <-
-  SimultaneousTypeSpecification(
-    TypedSignature(
-      response = "numeric",
-      predictor = "factor"),
-    TypedSignature(
-      response = "numeric",
-      predictor = "numeric"),
-    returnType = "anova")
-\end{verbatim}
 
 This starts to show the flexibility of \TypeInfo{}.  \STS{} allows for
 more than one \TypedSignature{}.  At least one of the
@@ -244,7 +227,7 @@ passed to the function in the \code{response} variable must return
 \code{TRUE} from the test \code{is(response, "numeric")}.  Because of
 this, \command{oneWayAnova} works with \code{response} as either
 \code{numeric} or \code{integer}.
-
+% 
 <<integerVals>>=
 iweight <- as.integer( weight )
 oneWayAnova( iweight, group )
@@ -257,8 +240,8 @@ requires an exact match between the class of an object and the
 specified class(es).  To specifying a strict match for \code{response}
 and \code{returnValue}, but an inherited match for \code{predictor},
 write
-
-<<strictIs, echo=FALSE>>=
+% 
+<<strictIs, keep.source=TRUE,eval=FALSE>>=
 oneWayAnova <- copyOfOneWayAnova
 typeInfo(oneWayAnova) <-
   SimultaneousTypeSpecification(
@@ -266,39 +249,29 @@ typeInfo(oneWayAnova) <-
       response = StrictIsTypeTest("numeric"),
       predictor = InheritsTypeTest("factor")),
     returnType = StrictIsTypeTest("anova"))
-try(oneWayAnova(iweight, group))    # ERROR
+oneWayAnova(iweight, group) # ERROR
 @ 
-
-\begin{verbatim}
-typeInfo(oneWayAnova) <-
-  SimultaneousTypeSpecification(
-    TypedSignature(
-      response = StrictIsTypeTest("numeric"),
-      predictor = InheritsTypeTest("factor")),
-    returnType = StrictIsTypeTest("anova"))
-\end{verbatim}
-<<strictIsTest>>=
-@ 
-
+% 
 Both \STT and \ITT{} accept a vector of class names.
 
 The \DTT{} allows evaluation of arbitrary expressions during type
 checking.  For instance, the ANOVA anticipates that the length of
 \code{predictor} is the same as the length of \code{response}:
-
-\begin{verbatim}
+% 
+<<dynamicTypeTest, keep.source=TRUE, eval=FALSE>>=
 typeInfo(oneWayAnova) <-
   SimultaneousTypeSpecification(
     TypedSignature(
       response = "numeric",
       predictor = quote(
-        length(predictor) == length(response) 
-          && is(predictor, "factor"))),
+        length(predictor) == 
+            length(response) &&
+        is(predictor, "factor"))),
     returnType = StrictIsTypeTest("anova"))
 short <- weight[-1]
 oneWayAnova(short, group)   # ERROR
-\end{verbatim}
-
+@ 
+% 
 Note that the expression in \DTT{} has access to argument names, and
 uses \command{quote} to protect premature evaluation.  \DTT{} can also
 be used in the return statement.
@@ -316,22 +289,14 @@ return type that depends on argument type.
 We saw how several \TypedSignature{} statements allow different types
 for \code{predictor}.  \ITS{} provides another mechanism to specifying
 alternative types:
-
-<<IndependentTypeSpecification, echo=FALSE>>=
+% 
+<<IndependentTypeSpecification, keep.source=TRUE>>=
 oneWayAnova <- copyOfOneWayAnova
 typeInfo(oneWayAnova) <-
   IndependentTypeSpecification(
     response = "numeric",
     predictor = c( "factor", "numeric" ))
 @ 
-
-\begin{verbatim}
-oneWayAnova <- copyOfOneWayAnova
-typeInfo(oneWayAnova) <-
-  IndependentTypeSpecification(
-    response = "numeric",
-    predictor = c("factor", "numeric"))
-\end{verbatim}
 
 \ITS{} expects a list of argument names, each with a character vector
 of possible types.  While \STS{} performs a logical OR across each
