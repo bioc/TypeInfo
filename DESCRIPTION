@@ -19,7 +19,7 @@ Description: A prototype for a mechanism for specifying the types of parameters 
        and it is of course run-time information. It is typically more meaningful.
 License: BSD
 LazyLoad: true
-SaveImage: true
+LazyLoad: true
 Depends: methods
 biocViews: Infrastructure
 
