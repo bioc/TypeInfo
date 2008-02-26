@@ -1,7 +1,7 @@
 rowQ =  orig =
 function (imat, which)
 {
-    if (inherits(imat, "exprSet"))
+    if (inherits(imat, "ExpressionSet"))
         imat = exprs(imat)
     if (any(is.na(imat)))
         stop("cannot handle missing values  -- yet")
