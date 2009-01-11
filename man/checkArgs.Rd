@@ -63,7 +63,7 @@ checkArgs(f = sys.function(1), argNames, args = NULL, forceAll = FALSE,
        arguments; defined internally when consulting \code{f} of class
        \code{function}}.
 }
-\details{}
+
 \value{
   If the check succeeds in matching the arguments to the parameter types,
   the signature that matched is returned.

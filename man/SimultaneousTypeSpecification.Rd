@@ -31,18 +31,14 @@ SimultaneousTypeSpecification(..., returnType, obj = new("SimultaneousTypeSpecif
   \item{obj}{the instance of \code{\link{TypeSpecification-class}} that is to
        be populated with the content of \code{\dots} and \code{returnType}.}
 }
-\details{
-}
+
 \value{
   The return value is \code{obj}.
   By default, this has class \code{\link{SimultaneousTypeSpecification-class}}.
   It should be an object of class \code{\link{TypeSpecification-class}}.
 }
-\references{}
+
 \author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
-\note{}
-
-
 
 \seealso{
   \code{\link{IndependentTypeSpecification}}

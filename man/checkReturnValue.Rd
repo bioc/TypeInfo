@@ -42,15 +42,14 @@ checkReturnValue(returnType, returnJump, sig, f = sys.function(-1))
   \item{f}{the function object whose return value is to be validated.
       It is from this that we get the type info via \code{\link{typeInfo}}.}
   }
-\details{
-}  
+
 \value{
   If the validation takes place and is successful
   or simply doesn't take place because no \code{returnType} is
   available, the return value is \code{value}.
   Otherwise, if the validation fails, an error is raised.
 }
-\references{}
+
 \author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
 \note{This is a prototype to illustrate the idea.
   It might be done in C code in the future within the R
@@ -61,7 +60,6 @@ checkReturnValue(returnType, returnJump, sig, f = sys.function(-1))
   \code{\link{checkArgs}}
   \code{\link{TypeSpecification-class}}  
 }
-\examples{
-}
+
 \keyword{programming}
 \keyword{interface}

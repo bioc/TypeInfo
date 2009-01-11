@@ -22,18 +22,14 @@ IndependentTypeSpecification(..., returnType, obj = new("IndependentTypeSpecific
   \item{obj}{the instance of class \code{\link{TypeSpecification-class}} that is to
     be populated with the values from \code{\dots} and \code{returnType}.}
 }
-\details{
 
-}
 \value{
   The return value is  \code{obj}
   after it has been populated with the arguments \code{\dots} and
   \code{returnType}.
 }
-\references{}
-\author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
-\note{}
 
+\author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
 
 \seealso{
   \code{\link{typeInfo}},   \code{\link{typeInfo<-}}
@@ -43,8 +39,7 @@ IndependentTypeSpecification(..., returnType, obj = new("IndependentTypeSpecific
   \code{\link{SimultaneousTypeSpecification-class}}
 }
 \examples{
-pow =
-function(a, b)
+pow = function(a, b)
 {
      # the return here is important to ensure the return value is checked.
    return(a^b)

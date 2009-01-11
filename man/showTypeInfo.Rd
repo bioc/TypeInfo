@@ -30,14 +30,12 @@ showTypeInfo(object, name=character(), prefix="", ...)
   \item{prefix}{Used by methods to ensure pretty indentation type specifications.}
   \item{...}{Additional arguments used for derivatives of \code{NamedTypeTest}, not noramlly assigned by user.}
 }
-\details{
-}
+
 \value{
   A list containing type information for \code{def}
 }
-\references{}
+
 \author{MT Morgan <mtmorgan@fhcrc.org>}
-\note{}
 
 \seealso{
   \code{\link{typeInfo}}

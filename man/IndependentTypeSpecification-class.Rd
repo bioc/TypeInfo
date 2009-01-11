@@ -115,9 +115,8 @@ Class \code{"vector"}, by class \code{"list"}.
   Available methods are computed in the example below; see the
   corresponding help page for details.
 }
-\references{}
+
 \author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
-\note{}
 
 \seealso{
   \code{\link{IndependentTypeSpecification}}

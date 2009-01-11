@@ -4,6 +4,7 @@
 
 \title{Class "ClassNameOrExpression" to represent type information as
   either class names or arbitrary language test}
+
 \description{
 
   This class is used to represent a type test that is specified either
@@ -17,21 +18,26 @@
   \code{DynamicTypeTest}, we could perhaps use a common base class.
 
 }
-\section{Objects from the Class}{A virtual Class: No objects may be created from it.}
-\section{Methods}{
-No methods defined with class "ClassNameOrExpression" in the signature.
-}
-\references{}
-\author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
-\note{}
 
+\section{Objects from the Class}{
+
+  A virtual Class: No objects may be created from it.
+
+}
+
+\section{Methods}{
+
+  No methods defined with class "ClassNameOrExpression" in the
+  signature.
+
+}
+
+\author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
 
 \seealso{
   \code{\link{TypedSignature}}
   \code{\link{TypedSignature-class}}
-   \code{\link{ReturnTypeSpecification}}
+  \code{\link{ReturnTypeSpecification}}
 }
-\examples{
 
-}
 \keyword{classes}

@@ -47,10 +47,8 @@ Class \code{"vector"}, by class \code{"character"}.
        converts a character vector into a \code{InheritsTypeTest}.}
   }
 }
-\references{}
-\author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
-\note{}
 
+\author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
 
 \seealso{
   \code{\link{TypedSignature}}

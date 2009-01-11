@@ -55,8 +55,5 @@ Class \code{"vector"}, by class \code{"list"}.
 \seealso{
  \code{\link{SimultaneousTypeSpecification}}
 }
-\examples{
 
-
-}
 \keyword{classes}

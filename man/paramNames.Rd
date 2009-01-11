@@ -23,21 +23,17 @@ paramNames(def)
   \item{def}{the object from which we are to identify the names of the
      parameters}
 }
-\details{
-}
+
 \value{
   A character vector giving the names of the parameters that
   were found.
 }
-\references{}
+
 \author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
-\note{}
 
 \seealso{
   \code{\link{typeInfo}}
 }
-\examples{
 
-}
 \keyword{programming}
 \keyword{interface}

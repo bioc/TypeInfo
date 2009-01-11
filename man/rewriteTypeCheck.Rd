@@ -32,17 +32,14 @@ rewriteTypeCheck(f, doReturn = TRUE, checkArgs = TRUE, addInvisible = FALSE)
  \item{addInvisible}{logical indicating whether returned argument needs
    to be cloaked in \code{invisible}.}
 }
-\details{
 
-}
 \value{
   The potentially modified version of the original input argument.
   The modifications contain any necessary changes to
   support the type checking at run-time.
 }
-\references{}
+
 \author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
-\note{}
 
 \seealso{
   \code{\link{typeInfo}}

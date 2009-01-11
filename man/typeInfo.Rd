@@ -25,9 +25,7 @@ typeInfo(func)
   }
   \item{value}{an object of class \code{\link{TypeSpecification-class}}}
 }
-\details{
 
-}
 \value{
   \code{typeInfo} returns the type information associated with
   the function.
@@ -40,8 +38,6 @@ typeInfo(func)
   \code{\link{checkArgs}}
   \code{\link{checkReturnValue}}  
 }
-\examples{
 
-}
 \keyword{programming}
 \keyword{interface}

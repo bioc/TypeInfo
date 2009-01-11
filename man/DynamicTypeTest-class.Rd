@@ -13,7 +13,7 @@
 Class \code{"ClassNameOrExpression"}, directly.
 }
 \section{Methods}{None.}
-\references{}
+
 \author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
 
 \seealso{

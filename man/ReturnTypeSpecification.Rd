@@ -17,9 +17,7 @@ ReturnTypeSpecification(type, obj = new("ReturnTypeSpecification"))
     or coercible to one.}
   \item{obj}{the instance that is to be populated and returned.}
 }
-\details{
 
-}
 \value{
  By default, an object of class
  \code{\link{ReturnTypeSpecification-class}}.
@@ -29,10 +27,8 @@ ReturnTypeSpecification(type, obj = new("ReturnTypeSpecification"))
  value of \code{obj}.
    
 }
-\references{}
-\author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
-\note{}
 
+\author{Duncan Temple Lang <duncan@wald.ucdavis.edu>}
 
 \seealso{
   \code{\link{IndependentTypeSpecification}}
