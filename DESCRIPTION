@@ -1,5 +1,5 @@
 Package: TypeInfo
-Version: 1.21.0
+Version: 1.21.1
 Date: 9/27/2005
 Title: Optional Type Specification Prototype
 Author: Duncan Temple Lang
@@ -23,6 +23,7 @@ Description: A prototype for a mechanism for specifying the types of
 License: BSD
 LazyLoad: true
 Depends: methods
+Suggests: Biobase 
 Collate: Classes.S checkArgs.S print.S rewrite.S support.S
 biocViews: Infrastructure
 
