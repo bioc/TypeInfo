@@ -1,5 +1,5 @@
 Package: TypeInfo
-Version: 1.61.0
+Version: 1.61.1
 Date: 9/27/2005
 Title: Optional Type Specification Prototype
 Author: Duncan Temple Lang
@@ -20,7 +20,7 @@ Description: A prototype for a mechanism for specifying the types of
        ii), but it is harder to use this information as meta-data as
        it requires more effort to interpret it and it is of course
        run-time information. It is typically more meaningful.
-License: BSD
+License: BSD_2_clause
 LazyLoad: true
 Depends: methods
 Suggests: Biobase 
